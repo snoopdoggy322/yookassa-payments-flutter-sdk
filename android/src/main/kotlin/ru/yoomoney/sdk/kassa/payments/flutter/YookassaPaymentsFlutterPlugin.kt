@@ -169,7 +169,7 @@ private fun PaymentParameters(data: Map<String, Object>): PaymentParameters {
   val title = data["title"] as String
   val subtitle = data["subtitle"] as String
   val shopId = data["shopId"] as String
-  val authCenterClientId = data["moneyAuthClientId"] as String
+  val authCenterClientId = data["moneyAuthClientId"] as? String
   val gatewayId = data["gatewayId"] as? String
   val userPhoneNumber = data["userPhoneNumber"] as? String
   val customReturnUrl = data["returnUrl"] as? String

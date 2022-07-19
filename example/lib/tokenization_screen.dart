@@ -48,7 +48,6 @@ class TokenizationScreenState extends State<TokenizationScreen> {
     var clientApplicationKey = "<Ключ для клиентских приложений>";
     var amount = Amount(value: double.parse(controller.text), currency: Currency.rub);
     var moneyAuthClientId = "<ID для центра авторизации в системе YooMoney>";
-    var applePayID = "<Идентификатор продавца Apple Pay>";
     var shopId = "<Идентификатор магазина в ЮKassa>";
     var applicationScheme = "<Схема вашего приложения для deeplink>" "://";
     var tokenizationModuleInputData = TokenizationModuleInputData(
@@ -59,7 +58,6 @@ class TokenizationScreenState extends State<TokenizationScreen> {
         savePaymentMethod: SavePaymentMethod.userSelects,
         isLoggingEnabled: true,
         moneyAuthClientId: moneyAuthClientId,
-        applePayID: applePayID,
         shopId: shopId,
         customerId: "<Уникальный идентификатор покупателя>",
         applicationScheme: applicationScheme,

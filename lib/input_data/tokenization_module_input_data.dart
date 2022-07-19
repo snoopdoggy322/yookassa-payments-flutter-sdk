@@ -12,9 +12,8 @@ class TokenizationModuleInputData {
   String subtitle;
   Amount amount;
   SavePaymentMethod savePaymentMethod;
-  String applePayID;
   String shopId;
-  String moneyAuthClientId;
+  String? moneyAuthClientId;
   HostParameters? hostParameters;
   String? gatewayId;
   TokenizationSettings tokenizationSettings;
@@ -27,6 +26,7 @@ class TokenizationModuleInputData {
   String? customerId;
   GooglePayParameters googlePayParameters;
   bool googlePayTestEnvironment;
+  String? applePayID;
 
   TokenizationModuleInputData(
       {required this.clientApplicationKey,
@@ -34,9 +34,8 @@ class TokenizationModuleInputData {
       required this.subtitle,
       required this.amount,
       required this.savePaymentMethod,
-      required this.applePayID,
       required this.shopId,
-      required this.moneyAuthClientId,
+      this.moneyAuthClientId,
       this.hostParameters,
       this.gatewayId,
       this.tokenizationSettings = const TokenizationSettings(),
@@ -48,7 +47,8 @@ class TokenizationModuleInputData {
       this.applicationScheme,
       this.customerId,
       this.googlePayParameters = const GooglePayParameters(),
-      this.googlePayTestEnvironment = false});
+      this.googlePayTestEnvironment = false,
+      this.applePayID});
 
   Map<String, dynamic> toJson() => {
         'clientApplicationKey': clientApplicationKey,

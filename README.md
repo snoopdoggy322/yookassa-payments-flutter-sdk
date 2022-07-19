@@ -15,12 +15,15 @@ dependencies:
   yookassa_payments_flutter: ^version
 ```
 
-2. Для iOS в файле your_project_name.podspec, лежащий в корне проекта в папке ios добавьте зависимость:
+или используйте команду `flutter pub add yookassa_payments_flutter`.
+
+2. В Podfile вашего приложения добавьте ссылки на репозитории с podspecs YooKassa:
 ```ruby
-s.dependency 'YooKassaPayments', '6.8.0'
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://git.yoomoney.ru/scm/sdk/cocoa-pod-specs.git'
 ```
 
-3. Запустите `pod install` в директории рядом с Runner.xcworkspace
+3. Запустите `pod install --repo-update` в директории рядом с Runner.xcworkspace
 
 4. В Info.plist своего приложения добавьте поддержку url-схем для корректной работы mSDK с оплатой через Сбер и ЮMoney:
 ```
@@ -76,7 +79,6 @@ B. В некоторых сложных случаях рекомендуем с
 ```dart
 var clientApplicationKey = "<Ключ для клиентских приложений>";
 var amount = Amount(value: 999.9, currency: Currency.rub);
-var applePayID = "<Идентификатор продавца Apple Pay>";
 var shopId = "<Идентификатор магазина в ЮKassa)>";
 var tokenizationModuleInputData =
           TokenizationModuleInputData(clientApplicationKey: clientApplicationKey,
@@ -88,6 +90,10 @@ var tokenizationModuleInputData =
 ```
 
 2. Запустите процесс токенизации с кейсом `.tokenization` и передайте `TokenizationModuleInputData`.
+
+```dart
+var result = await YookassaPaymentsFlutter.tokenization(tokenizationModuleInputData);
+```
 
 3. Получите token в `TokenizationResult`
 
@@ -339,7 +345,6 @@ func application(
 | clientApplicationKey | String            | Ключ для клиентских приложений из личного кабинета ЮKassa |
 | title                | String            | Название магазина в форме оплаты |
 | subtitle             | String            | Описание заказа в форме оплаты |
-| purchaseDescription  | String            | Описание заказа в форме оплаты |
 | amount               | Amount            | Объект, содержащий сумму заказа и валюту |
 | shopId               | String            | Идентификатор магазина в ЮKassa ([раздел Организации](https://yookassa.ru/my/company/organization) - скопировать shopId у нужного магазина) |
 | savePaymentMethod    | SavePaymentMethod | Объект, описывающий логику того, будет ли платеж рекуррентным |
@@ -370,7 +375,6 @@ func application(
 | -------------------- | ------ | -------- |
 | clientApplicationKey | String | Ключ для клиентских приложений из личного кабинета ЮKassa |
 | title                | String | Название магазина в форме оплаты |
-| purchaseDescription  | String | Описание заказа в форме оплаты |
 | subtitle             | String | Описание заказа в форме оплаты |
 | paymentMethodId      | String | Идентификатор сохраненного способа оплаты |
 | amount               | Amount | Объект, содержащий сумму заказа и валюту |
@@ -495,10 +499,8 @@ var savedBankCardModuleInputData = SavedBankCardModuleInputData(
     clientApplicationKey: clientApplicationKey,
     title: "Космические объекты",
     subtitle: "Комета повышенной яркости, период обращения — 112 лет",
-    purchaseDescription: "root.description",
     amount: amount,
     savePaymentMethod: SavePaymentMethod.on,
-    applePayID: applePayID,
     shopId: shopId,
     paymentMethodId: paymentMethodId
 );
