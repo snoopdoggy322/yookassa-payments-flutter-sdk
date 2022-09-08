@@ -22,6 +22,19 @@
                 "--flavor",
                 "dev"
             ]
+        },
+        {
+            "name": "demo-debug-prod",
+            "cwd": "demo",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "-t",
+                "lib/main_prod.dart",
+                "--flavor",
+                "prod"
+            ]
         }
     ]
 }

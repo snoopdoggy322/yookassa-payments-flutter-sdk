@@ -6,6 +6,7 @@ import ru.yoomoney.sdk.kassa.payments.checkoutParameters.PaymentMethodType
 
 fun TokenizationResult.toJson(): String {
     val json = JSONObject()
+    json.put("status", "success")
     json.put("paymentToken", paymentToken)
     json.put("paymentMethodType", when(paymentMethodType) {
         PaymentMethodType.YOO_MONEY -> "yoo_money"

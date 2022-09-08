@@ -9,6 +9,7 @@ var flutterController: FlutterViewController?
 var yoomoneyController: UIViewController?
 
 public class SwiftYookassaPaymentsFlutterPlugin: NSObject, FlutterPlugin {
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "ru.yoomoney.yookassa_payments_flutter/yoomoney", binaryMessenger: registrar.messenger())
     let instance = SwiftYookassaPaymentsFlutterPlugin()
@@ -18,25 +19,30 @@ public class SwiftYookassaPaymentsFlutterPlugin: NSObject, FlutterPlugin {
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     flutterResult = result
 
+    // Tokenezation Flow
+
     if (call.method == YooMoneyService.tokenization.rawValue) {
-      guard let data = call.arguments as? [String:AnyObject],
-        let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .prettyPrinted),
-        let tokenizationModuleInputData = try? JSONDecoder().decode(TokenizationModuleInputData.self, from: jsonData)
-      else {
-        result(YooMoneyErrors.tokenizationData.rawValue)
-        return
-      }
+        guard let data = call.arguments as? [String:AnyObject],
+            let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .prettyPrinted),
+            let tokenizationModuleInputData = try? JSONDecoder().decode(TokenizationModuleInputData.self, from: jsonData)
+        else {
+            result(YooMoneyErrors.tokenizationData.rawValue)
+            return
+        }
+        
+        let controller = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController
+        let inputData: TokenizationFlow = .tokenization(tokenizationModuleInputData)
 
-      let inputData: TokenizationFlow = .tokenization(tokenizationModuleInputData)
+        if let flutterVC = controller {
+            let tokenezationViewController = TokenizationAssembly.makeModule(inputData: inputData, moduleOutput: flutterVC)
+            yoomoneyController = tokenezationViewController;
+            flutterController = flutterVC;
 
-      let controller = UIApplication.shared.delegate?.window??.rootViewController as! FlutterViewController
-
-      let vc = TokenizationAssembly.makeModule(inputData: inputData, moduleOutput: controller)
-      controller.present(vc, animated: true, completion: nil)
-
-      flutterController = controller
-      yoomoneyController = vc
+            flutterVC.present(tokenezationViewController, animated: true, completion: nil)
+        }
     }
+
+    // Confirmation Flow
 
     if (call.method == YooMoneyService.confirmation.rawValue) {
         guard let data = call.arguments as? [String:AnyObject],
@@ -79,6 +85,8 @@ public class SwiftYookassaPaymentsFlutterPlugin: NSObject, FlutterPlugin {
         )
     }
 
+    // BankCardRepeat Flow
+
     if (call.method == YooMoneyService.repeatPayment.rawValue) {
        guard let data = call.arguments as? [String:AnyObject],
          let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .prettyPrinted),
@@ -94,6 +102,7 @@ public class SwiftYookassaPaymentsFlutterPlugin: NSObject, FlutterPlugin {
 
        if let controller = flutterController {
             let vc = TokenizationAssembly.makeModule(inputData: inputData, moduleOutput: controller)
+            yoomoneyController = vc
             tokenizationModuleInput = vc
             controller.present(vc, animated: true, completion: nil)
        }
@@ -102,21 +111,6 @@ public class SwiftYookassaPaymentsFlutterPlugin: NSObject, FlutterPlugin {
 }
 
 extension FlutterViewController: TokenizationModuleOutput {
-    public func didSuccessfullyPassedCardSec(on module: TokenizationModuleInput) {
-        DispatchQueue.main.async { [weak self] in
-          guard let self = self else { return }
-          let alertController = UIAlertController(
-            title: "3D-Sec",
-            message: "Successfully passed 3d-sec",
-            preferredStyle: .alert
-          )
-
-          let action = UIAlertAction(title: "OK", style: .default)
-          alertController.addAction(action)
-          self.dismiss(animated: true)
-          self.present(alertController, animated: true)
-        }
-    }
 
     public func tokenizationModule(
         _ module: TokenizationModuleInput,
@@ -126,7 +120,7 @@ extension FlutterViewController: TokenizationModuleOutput {
         tokenizationModuleInput = module
         
         if let result = flutterResult {
-            result("{\"paymentToken\": \"\(token.paymentToken)\", \"paymentMethodType\": \"\(paymentMethodType.rawValue)\"}")
+            result("{\"status\":\"success\", \"paymentToken\": \"\(token.paymentToken)\", \"paymentMethodType\": \"\(paymentMethodType.rawValue)\"}")
             DispatchQueue.main.async {
                 if let controller = yoomoneyController {
                     controller.dismiss(animated: true)
@@ -144,24 +138,22 @@ extension FlutterViewController: TokenizationModuleOutput {
                 controller.dismiss(animated: true)
             }
         }
+        guard let result = flutterResult else { return }
+        if let error = error {
+            result("{\"status\":\"error\", \"error\": \"\(error.localizedDescription)\"}")
+        } else {
+            result("{\"status\":\"canceled\"}")
+        }
     }
 
-    public func didSuccessfullyConfirmation(
-        paymentMethodType: PaymentMethodType
-    ) {
+    public func didFinishConfirmation(paymentMethodType: PaymentMethodType) {
+        guard let result = flutterResult else { return }
         DispatchQueue.main.async { [weak self] in
-          guard let self = self else { return }
-          let alertController = UIAlertController(
-            title: "Confirmation",
-            message: "Successfully confirmation",
-            preferredStyle: .alert
-          )
-
-          let action = UIAlertAction(title: "OK", style: .default)
-          alertController.addAction(action)
-          self.dismiss(animated: true)
-          self.present(alertController, animated: true)
+            if let controller = yoomoneyController {
+                controller.dismiss(animated: true)
+            }
         }
+        result("{\"paymentMethodType\": \"\(paymentMethodType.rawValue)\"}")
     }
 }
 
@@ -292,8 +284,8 @@ extension TokenizationModuleInputData: Decodable {
 extension BankCardRepeatModuleInputData: Decodable {
     enum CodingKeys: String, CodingKey {
         case clientApplicationKey = "clientApplicationKey"
-        case shopName = "shopName"
-        case purchaseDescription = "purchaseDescription"
+        case shopName = "title"
+        case purchaseDescription = "subtitle"
         case amount = "amount"
         case savePaymentMethod = "savePaymentMethod"
         case paymentMethodId = "paymentMethodId"

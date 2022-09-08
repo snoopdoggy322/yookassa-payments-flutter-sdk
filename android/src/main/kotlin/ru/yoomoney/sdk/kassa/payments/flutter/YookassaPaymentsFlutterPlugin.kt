@@ -36,6 +36,9 @@ import ru.yoomoney.sdk.kassa.payments.checkoutParameters.TestParameters
 import ru.yoomoney.sdk.kassa.payments.TokenizationResult
 import ru.yoomoney.sdk.kassa.payments.checkoutParameters.UiParameters
 
+private const val CANCELED_RESULT = "{\"status\":\"canceled\"}"
+private const val ERROR_RESULT = "{\"status\":\"error\"}"
+
 class YookassaPaymentsFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener  {
 
   private lateinit var flutterResult: Result
@@ -123,9 +126,13 @@ class YookassaPaymentsFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityA
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
     if (requestCode == REQUEST_CODE_TOKENIZE) {
-      if (resultCode == Activity.RESULT_OK && data != null) {
+      if (resultCode == Activity.RESULT_CANCELED) {
+        flutterResult.success(CANCELED_RESULT)
+      } else if (resultCode == Activity.RESULT_OK && data != null) {
         val result: TokenizationResult = Checkout.createTokenizationResult(data);
         flutterResult.success(result.toJson())
+      } else {
+        flutterResult.success(ERROR_RESULT)
       }
     } else if (requestCode == REQUEST_CODE_CONFIRMATION) {
       flutterResult.success(resultCode)
