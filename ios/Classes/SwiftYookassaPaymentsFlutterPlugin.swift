@@ -214,11 +214,6 @@ extension TokenizationModuleInputData: Decodable {
         case applicationScheme = "applicationScheme"
         case customerId = "customerId"
         case hostParameters = "hostParameters"
-        
-        enum CustomizationKeys: String, CodingKey {
-            case mainScheme = "mainScheme"
-            case showYooKassaLogo = "showYooKassaLogo"
-        }
     }
 
     public init(from decoder: Decoder) throws {
@@ -231,9 +226,7 @@ extension TokenizationModuleInputData: Decodable {
         let gatewayId = try? values.decode(String.self, forKey: .gatewayId)
         
         let settings = try values.decode(TokenizationSettings.self, forKey: .tokenizationSettings)
-        let customizationContainer = try values.nestedContainer(keyedBy: CodingKeys.CustomizationKeys.self, forKey: .customizationSettings)
-        let showYooKassaLogo = try customizationContainer.decode(Bool.self, forKey: .showYooKassaLogo)
-        let tokenizationSettings = TokenizationSettings(paymentMethodTypes: settings.paymentMethodTypes, showYooKassaLogo: showYooKassaLogo)
+        let tokenizationSettings = TokenizationSettings(paymentMethodTypes: settings.paymentMethodTypes)
         
         let testModeSettings = try? values.decode(TestModeSettings.self, forKey: .testModeSettings)
         let applePayMerchantIdentifier = try? values.decode(String.self, forKey: .applePayMerchantIdentifier)
@@ -379,8 +372,7 @@ extension TokenizationSettings: Decodable {
             }
         }
 
-        let showYooKassaLogo = try values.decodeIfPresent(Bool.self, forKey: .showYooKassaLogo)
-        self.init(paymentMethodTypes: paymentTypes, showYooKassaLogo: showYooKassaLogo ?? true)
+        self.init(paymentMethodTypes: paymentTypes)
     }
 }
 
@@ -412,11 +404,13 @@ extension TestModeSettings: Decodable {
 extension CustomizationSettings: Decodable {
     enum CodingKeys: String, CodingKey {
         case mainScheme = "mainScheme"
+        case showYooKassaLogo = "showYooKassaLogo"
     }
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let schemeColor = try values.decode(Color.self, forKey: .mainScheme)
+        let showYooKassaLogo = try values.decode(Bool.self, forKey: .showYooKassaLogo)
 
         self.init(mainScheme:
                     UIColor(
@@ -424,7 +418,8 @@ extension CustomizationSettings: Decodable {
                         green: schemeColor.green,
                         blue: schemeColor.blue,
                         alpha: schemeColor.alpha
-                    )
+                    ),
+                    showYooKassaLogo: showYooKassaLogo
         )
     }
 }

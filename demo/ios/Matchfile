@@ -1,0 +1,7 @@
+git_url("ssh://git@bitbucket.yooteam.ru/mt/apple-dev-sign.git")
+app_identifier([
+    "ru.yoo.kassa.debug",
+    "ru.yoo.kassa.debug.notificationService",
+    "ru.yoo.kassa.debug.Widget",
+    "ru.yoo.*"
+])
