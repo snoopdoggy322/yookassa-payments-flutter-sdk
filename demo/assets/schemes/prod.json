@@ -1,9 +1,0 @@
-{
-  "shopId": "193856",
-  "gatewayId": null,
-  "clientApplicationKey": "live_MTkzODU2VY5GiyQq2GMPsCQ0PW7f_RSLtJYOT-mp_CA",
-  "moneyAuthClientId": "hitm6hg51j1d3g1u3ln040bajiol903b",
-  "applePayID": "merchant.ru.yoo.sdk.kassa.payments",
-  "applicationScheme": "yookassapaymentsflutter",
-  "hostParameters": null
-}

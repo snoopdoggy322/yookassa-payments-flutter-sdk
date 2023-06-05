@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yookassa_payments_flutter/yookassa_payments_flutter.dart';
 import 'package:yookassa_payments_flutter_example/success_tokenization_screen.dart';
-import 'package:yookassa_payments_flutter/models/tokenization_result.dart';
 
 class TokenizationScreen extends StatefulWidget {
   const TokenizationScreen({Key? key}) : super(key: key);

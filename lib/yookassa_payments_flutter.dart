@@ -15,7 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:yookassa_payments_flutter/models/tokenization_result.dart';
 import 'input_data/tokenization_module_input_data.dart';
 import 'models/payment_method_types.dart';
-import 'models/tokenization_result.dart';
 
 class YookassaPaymentsFlutter {
   static const MethodChannel _channel =

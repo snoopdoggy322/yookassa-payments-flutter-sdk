@@ -1,3 +1,7 @@
+# 1.0.5
+
+* Fix bug with return confirmation result for iOS platform
+
 # 1.0.4
 
 * Added processing of Mintsifra certificates in webView to keep banking services working

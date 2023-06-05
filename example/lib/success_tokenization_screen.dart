@@ -13,17 +13,13 @@ class SuccessTokenizationScreen extends StatefulWidget {
   final SavedBankCardModuleInputData? repeatData;
 
   @override
-  State<StatefulWidget> createState() =>
-      SuccessTokenizationScreenState(result, tokenizationData, repeatData);
+  State<StatefulWidget> createState() => _SuccessTokenizationScreenState();
 }
 
-class SuccessTokenizationScreenState extends State<SuccessTokenizationScreen> {
-  final SuccessTokenizationResult result;
-  final TokenizationModuleInputData? tokenizationData;
-  final SavedBankCardModuleInputData? repeatData;
-
-  SuccessTokenizationScreenState(
-      this.result, this.tokenizationData, this.repeatData);
+class _SuccessTokenizationScreenState extends State<SuccessTokenizationScreen> {
+  late SuccessTokenizationResult result;
+  late TokenizationModuleInputData? tokenizationData;
+  late SavedBankCardModuleInputData? repeatData;
 
   late TextEditingController controller;
 
@@ -31,6 +27,9 @@ class SuccessTokenizationScreenState extends State<SuccessTokenizationScreen> {
   void initState() {
     controller = TextEditingController();
     super.initState();
+    result = widget.result;
+    tokenizationData = widget.tokenizationData;
+    repeatData = widget.repeatData;
   }
 
   @override
