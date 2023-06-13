@@ -1,3 +1,7 @@
+# 1.0.6
+
+* Fix crash with 3DS confirmation for Android Platform
+
 # 1.0.5
 
 * Fix bug with return confirmation result for iOS platform
