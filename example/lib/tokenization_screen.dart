@@ -64,7 +64,8 @@ class TokenizationScreenState extends State<TokenizationScreen> {
         tokenizationSettings: const TokenizationSettings(PaymentMethodTypes([
           PaymentMethod.bankCard,
           PaymentMethod.yooMoney,
-          PaymentMethod.sberbank
+          PaymentMethod.sberbank,
+          PaymentMethod.sbp
         ])),
         testModeSettings: null);
     var result =

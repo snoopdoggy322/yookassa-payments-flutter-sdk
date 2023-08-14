@@ -1,3 +1,11 @@
+# 1.1.1
+
+* Fix SBP implementation readme. Fix and improve UI
+
+# 1.1.0
+
+* Support new payment method — SBP
+
 # 1.0.6
 
 * Fix crash with 3DS confirmation for Android Platform

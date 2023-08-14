@@ -56,6 +56,8 @@ PaymentMethod? _paymentMethodFromString(String type) {
       return PaymentMethod.applePay;
     case "google_pay":
       return PaymentMethod.googlePay;
+    case "sbp":
+      return PaymentMethod.sbp;
     default:
       return null;
   }

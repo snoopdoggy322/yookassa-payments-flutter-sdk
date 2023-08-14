@@ -13,6 +13,7 @@ fun TokenizationResult.toJson(): String {
         PaymentMethodType.BANK_CARD -> "bank_card"
         PaymentMethodType.SBERBANK -> "sberbank"
         PaymentMethodType.GOOGLE_PAY -> "google_pay"
+        PaymentMethodType.SBP -> "sbp"
     })
     return json.toString()
 }

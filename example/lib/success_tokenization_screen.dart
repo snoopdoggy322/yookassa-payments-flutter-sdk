@@ -55,8 +55,9 @@ class _SuccessTokenizationScreenState extends State<SuccessTokenizationScreen> {
           ),
           ElevatedButton(
               onPressed: () async {
+                var clientApplicationKey = "<Ключ для клиентских приложений>";
                 await YookassaPaymentsFlutter.confirmation(
-                    controller.text, result.paymentMethodType);
+                    controller.text, result.paymentMethodType, clientApplicationKey);
                 showDialog(
                     context: context,
                     builder: (context) => const AlertDialog(

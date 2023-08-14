@@ -74,14 +74,17 @@ class YookassaPaymentsFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityA
       "yooMoney" -> PaymentMethodType.YOO_MONEY
       "sberbank" -> PaymentMethodType.SBERBANK
       "googlePay" -> PaymentMethodType.GOOGLE_PAY
+      "sbp" -> PaymentMethodType.SBP
       else -> PaymentMethodType.BANK_CARD
     }
 
     val url = data["url"] as String
+    val clientApplicationKey = data["clientApplicationKey"] as String?
 
     val intent: Intent = Checkout.createConfirmationIntent(
       context = context,
       confirmationUrl = url,
+      clientApplicationKey = clientApplicationKey,
       paymentMethodType = paymentMethod
     )
 
@@ -213,6 +216,7 @@ private fun PaymentMethodType(data: Map<String, Object>): Set<PaymentMethodType>
       "PaymentMethod.yooMoney" -> paymentMethodTypes.add(PaymentMethodType.YOO_MONEY)
       "PaymentMethod.sberbank" -> paymentMethodTypes.add(PaymentMethodType.SBERBANK)
       "PaymentMethod.googlePay" -> paymentMethodTypes.add(PaymentMethodType.GOOGLE_PAY)
+      "PaymentMethod.sbp" -> paymentMethodTypes.add(PaymentMethodType.SBP)
     }
   }
   return paymentMethodTypes

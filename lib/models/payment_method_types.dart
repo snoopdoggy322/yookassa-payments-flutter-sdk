@@ -16,16 +16,19 @@ class PaymentMethodTypes {
       PaymentMethodTypes([PaymentMethod.applePay]);
   static const PaymentMethodTypes googlePay =
       PaymentMethodTypes([PaymentMethod.googlePay]);
+  static const PaymentMethodTypes sbp =
+      PaymentMethodTypes([PaymentMethod.sbp]);
   static const PaymentMethodTypes all = PaymentMethodTypes([
     PaymentMethod.bankCard,
     PaymentMethod.yooMoney,
     PaymentMethod.sberbank,
     PaymentMethod.applePay,
-    PaymentMethod.googlePay
+    PaymentMethod.googlePay,
+    PaymentMethod.sbp
   ]);
 }
 
-enum PaymentMethod { bankCard, yooMoney, applePay, googlePay, sberbank }
+enum PaymentMethod { bankCard, yooMoney, applePay, googlePay, sberbank, sbp }
 
 extension PaymentMethodExtension on PaymentMethod {
   static PaymentMethod fromStringValue(String rawValue) {
@@ -40,6 +43,8 @@ extension PaymentMethodExtension on PaymentMethod {
         return PaymentMethod.applePay;
       case 'google_pay':
         return PaymentMethod.googlePay;
+      case 'sbp':
+        return PaymentMethod.sbp;
     }
     return PaymentMethod.bankCard;
   }

@@ -63,6 +63,8 @@ public class SwiftYookassaPaymentsFlutterPlugin: NSObject, FlutterPlugin {
           paymentMethod = .sberbank
         case "applePay":
           paymentMethod = .applePay
+        case "sbp":
+          paymentMethod = .sbp
         default: break
         }
 
@@ -368,6 +370,8 @@ extension TokenizationSettings: Decodable {
                 paymentTypes.insert(.sberbank)
             case "PaymentMethod.applePay":
                 paymentTypes.insert(.applePay)
+            case "PaymentMethod.sbp":
+                paymentTypes.insert(.sbp)
             default: break
             }
         }

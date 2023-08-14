@@ -30,8 +30,8 @@ class YookassaPaymentsFlutter {
   }
 
   static Future<void> confirmation(
-      String url, PaymentMethod? paymentMethod) async {
-    var inputData = {'url': url, 'paymentMethod': paymentMethod?.name};
+      String url, PaymentMethod? paymentMethod, String? clientApplicationKey) async {
+    var inputData = {'url': url, 'paymentMethod': paymentMethod?.name, 'clientApplicationKey': clientApplicationKey};
     return await _channel.invokeMethod('confirmation', inputData);
   }
 

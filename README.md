@@ -122,6 +122,9 @@ await YookassaPaymentsFlutter.confirmation("3ds / App2App ссылка", result.
 `.yooMoney` — ЮMoney (платежи из кошелька или привязанной картой)\
 `.bankCard` — банковская карта (карты можно сканировать)\
 `.sberbank` — SberPay (с подтверждением через приложение Сбербанк Онлайн, если оно установленно, иначе с подтверждением по смс)\
+`.applePay` — Apple Pay\
+`.googlePay` — Google Pay
+`.sbp` - СБП\
 
 ## Настройка способов оплаты
 
@@ -148,6 +151,21 @@ if (<Условие для Сбербанка Онлайн>) {
 if (<Условие для ЮMoney>) {
     // Добавляем в paymentMethodTypes элемент `PaymentMethod.yooMoney`
     paymentMethodTypes.add(PaymentMethod.yooMoney);
+}
+
+if <Условие для Apple Pay> {
+    // Добавляем в paymentMethodTypes элемент `.applePay`
+    paymentMethodTypes.insert(.applePay)
+}
+
+if <Условие для Google Pay> {
+    // Добавляем в paymentMethodTypes элемент `.googlePay`
+    paymentMethodTypes.insert(.googlePay)
+}
+
+if <Условие для СБП> {
+    // Добавляем в paymentMethodTypes элемент `.sbp`
+    paymentMethodTypes.insert(.sbp)
 }
 
 var settings = TokenizationSettings(PaymentMethodTypes(paymentMethodTypes));
@@ -229,19 +247,6 @@ func application(
     )
 }
 
-@available(iOS 9.0, *)
-func application(
-    _ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-) -> Bool {
-    return YKSdk.shared.handleOpen(
-        url: url,
-        sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String
-    )
-}
-```
-
 4. В `Info.plist` добавьте следующие строки:
 
 ```plistbase
@@ -303,19 +308,6 @@ func application(
     )
 }
 
-@available(iOS 9.0, *)
-func application(
-    _ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-) -> Bool {
-    return YKSdk.shared.handleOpen(
-        url: url,
-        sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String
-    )
-}
-```
-
 3. В `Info.plist` добавьте следующие строки:
 
 ```plistbase
@@ -340,7 +332,130 @@ func application(
 
 где `examplescheme` - схема для открытия вашего приложения, которую вы указали в `applicationScheme` при создании `TokenizationModuleInputData`. Через эту схему будет открываться ваше приложение после успешной оплаты с помощью `SberPay`.
 
-4. Обработка успешного подтверждения уже реализована в плагине. Плагин отобразит алерт с информацией об успешном подтверждении.
+### SBP
+
+С помощью SDK можно провести платеж через СБП — с подтверждением оплаты через приложение банка.
+
+В `TokenizationModuleInputData` необходимо передавать `applicationScheme` – схема для возврата в ваше приложение после успешного подтверждения платежа в приложении банка.
+
+Пример `applicationScheme`:
+
+```swift
+let moduleData = TokenizationModuleInputData(
+    ...
+    applicationScheme: "examplescheme://"
+```
+
+Чтобы провести платёж:
+
+1. При создании `TokenizationModuleInputData` в `TokenizationSettings` передайте значение `PaymentMethodTypes.sbp`.
+2. Получите токен.
+3. [Создайте платеж](https://yookassa.ru/developers/api#create_payment) с токеном по API ЮKassa.
+
+Для подтверждения платежа через выбранное пользователем банковское приложение:
+
+1. В `AppDelegate` импортируйте зависимость `YooKassaPayments`:
+
+   ```swift
+   import YooKassaPayments
+   ```
+
+2. Добавьте обработку ссылок через `YKSdk` в `AppDelegate`:
+
+```swift
+func application(
+    _ application: UIApplication,
+    open url: URL,
+    sourceApplication: String?, 
+    annotation: Any
+) -> Bool {
+    return YKSdk.shared.handleOpen(
+        url: url,
+        sourceApplication: sourceApplication
+    )
+}
+```
+
+3. В `Info.plist` добавьте следующие строки:
+
+```plistbase
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>${BUNDLE_ID}</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>examplescheme</string>
+        </array>
+    </dict>
+</array>
+```
+
+где `examplescheme` - схема для открытия вашего приложения, которую вы указали в `applicationScheme` при создании `TokenizationModuleInputData`. Через эту схему будет открываться ваше приложение после успешной оплаты с помощью `SberPay`.
+
+4. В `Info.plist` перечислить url-схемы приложений приоритетных для вас банков
+
+SDK пользователю отображается список банков, поддерживающих оплату `СБП`. При выборе конкретного банка из списка произойдет переход в соответствующее банковское приложение.
+Список банков в SDK сформирован на основе ответа [НСПК](https://qr.nspk.ru/proxyapp/c2bmembers.json). Он содержит более тысячи банков, и для удобства SDK в первую очередь отображает список популярных банков, которые чаще всего используют для оплаты. Для проверки факта установки приложения на телефоне мы используем системную функцию [canOpenURL(:)](https://developer.apple.com/documentation/uikit/uiapplication/1622952-canopenurl). Данная функция возвращает корректный ответ только для схем добавленных в `Info.plist` с ключом `LSApplicationQueriesSchemes`.
+Поэтому для корректного отображения списка популярных банков вам необходимо внести в `Info.plist` их url-схемы:
+
+```plistbase
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>bank100000000111</string> // Сбербанк
+    <string>bank100000000004</string> // Тинькофф
+    <string>bank110000000005</string> // ВТБ
+    <string>bank100000000008</string> // Альфа
+    <string>bank100000000007</string> // Райфайзен
+    <string>bank100000000015</string> // Открытие
+</array>
+```
+
+Если список не добавлять в `Info.plist`, SDK сразу отобразит полный список банков поддерживающих оплату `СБП`.
+
+5. Добавьте уникальную схему в `build.gradle`
+Для добавления уникальной схемы диплинка нужно добавить в ваш файл `build.gradle` в блок android.defaultConfig строку `resValue "string", "ym_app_scheme", "exampleapp"`
+```
+android {
+    defaultConfig {
+        resValue "string", "ym_app_scheme", "exampleapp"
+    }
+}
+```
+Или добавить в ваш strings.xml строку вида:
+```
+<resources>
+    <string name="ym_app_scheme" translatable="false">exampleapp</string>
+</resources>
+```
+Где `exampleapp` - это уникальная схема диплинка вашего приложения.
+
+6. Для подтверждения платежа при оплате через СБП необходимо запустить сценарий подтверждения:
+
+```dart
+var clientApplicationKey = "<Ключ для клиентских приложений>";
+
+await YookassaPaymentsFlutter.confirmation(confirmationUrl, PaymentMethod.sbp, clientApplicationKey);
+)
+```
+`confirmationUrl` вы получите в ответе от API ЮKassa при [создании платежа](https://yookassa.ru/developers/api#create_payment); он имеет вид   "https://qr.nspk.ru/id?type=&bank=&sum=&cur=&crc=&payment_id="
+
+7. После того, как пользователь пройдет процесс подтверждения платежа или пропустит его будет вызван метод протокола `TokenizationModuleOutput`. Обработайте в нем результат подтверждения:
+
+```swift
+func didFinishConfirmation(paymentMethodType: PaymentMethodType) {
+    guard let result = flutterResult else { return }
+    DispatchQueue.main.async { [weak self] in
+        if let controller = yoomoneyController {
+            controller.dismiss(animated: true)
+        }
+    }
+    result("{\"paymentMethodType\": \"\(paymentMethodType.rawValue)\"}")
+}
+```
 
 ## Описание публичных параметров
 
@@ -453,11 +568,38 @@ func application(
 Отправьте токен на ваш сервер и после успешной оплаты закройте модуль.\
 Если ваш сервер сообщил о необходимости подтверждения платежа (т.е. платёж пришёл со статусом `pending`), вызовите метод `confirmation(confirmationUrl, paymentMethodType)`.
 
-Примеры кода:
+Пример кода:
 
 ```dart
-await YookassaPaymentsFlutter.confirmation(controller.text, result.paymentMethodType);
+await YookassaPaymentsFlutter.confirmation(confirmationUrl, result.paymentMethodType);
 )
+```
+
+Если тип платежа - СБП необходимо также передать clientApplicationKey - Ключ для клиентских приложений из личного кабинета ЮKassa
+
+Пример кода:
+
+```dart
+
+var clientApplicationKey = "<Ключ для клиентских приложений>";
+
+await YookassaPaymentsFlutter.confirmation(confirmationUrl, result.paymentMethodType, clientApplicationKey);
+)
+```
+`confirmationUrl` вы получите в ответе от API ЮKassa при [создании платежа](https://yookassa.ru/developers/api#create_payment); он имеет вид   "https://qr.nspk.ru/id?type=&bank=&sum=&cur=&crc=&payment_id="
+
+После того, как пользователь пройдет процесс подтверждения платежа или пропустит его будет вызван метод протокола `TokenizationModuleOutput`. Обработайте в нем результат подтверждения:
+
+```swift
+func didFinishConfirmation(paymentMethodType: PaymentMethodType) {
+    guard let result = flutterResult else { return }
+    DispatchQueue.main.async { [weak self] in
+        if let controller = yoomoneyController {
+            controller.dismiss(animated: true)
+        }
+    }
+    result("{\"paymentMethodType\": \"\(paymentMethodType.rawValue)\"}")
+}
 ```
 
 ## Логирование
