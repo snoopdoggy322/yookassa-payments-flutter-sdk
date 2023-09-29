@@ -5,6 +5,10 @@
 ### NEXT_VERSION_DESCRIPTION_BEGIN
 ### NEXT_VERSION_DESCRIPTION_END
 
+## [1.2.2] (29-09-2023)
+
+* Fix unnecessary_non_null_assertion warnings in test
+
 ## [1.2.1] (28-09-2023)
 
 * Add parameters for deploying to pub.dev
